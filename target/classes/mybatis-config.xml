@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- spring의 config파일은 아래 순서를 지켜서 작성해야한다. -->
+	<settings>
+		<!-- MyBatis에서 쿼리에 매핑되는 파라미터에 null값이 있을 경우 에러 발생 방지 -->
+		<setting name="jdbcTypeForNull" value="NULL" />
+		
+		<!-- MyBatis에서 캐싱 기능 종료 -->
+		<setting name="cacheEnabled" value="false" />
+	</settings>
+	
+	<!-- mapper가 사용할 VO를 설정하는 태그 -->
+	<!-- alias로 지정한 값은 mapper의 파라미터나 결과 타입으로 사용할 수 있다. -->
+	<typeAliases>
+		<typeAlias type="com.ict.dao.VO" alias="vo" />
+	</typeAliases>
+	
+	<!-- 사용할 mapper들을 정의해놓은 태그 -->
+	<!-- 사용할 mapper들은 mappers폴더에 모여있다. -->
+	<mappers>
+		<mapper resource="mappers/guestbook2_mapper.xml" />
+	</mappers>
+</configuration>

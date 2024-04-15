@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- 아래 순서는 체인처럼 연결되었기때문에 순서대로 작성해야한다. -->
+	
+	<!-- BDS에서 EL값을 넣어줄 파일을 지정해주는 속성 -->
+	<!-- 해당 classpath는 src/main/resources에 작성한다.-->
+	<context:property-placeholder location="classpath:props/jdbc.properties"/>
+	
+	<!-- 오라클 접속 정보 입력 : BDS(BasicDataSource) 클래스 사용 -->
+	<!-- 보안 위험 때문에 value들을 전부 EL로 작성한다. -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.user}"/>
+		<property name="password" value="${jdbc.pwd}"/>
+		
+		<!-- 아래 3개는 여러사람이 DB를 사용할 때 과부하를 조절하는 선택 옵션 -->
+		<!-- 동시에 사용할 수 있는 최대 커넥션의 수 -->
+		<property name="maxActive" value="${jdbc.maxActive}" />
+		
+		<!-- 커넥션 풀에 반납할 때 최대로 유지되는 커넥션의수  -->
+		<property name="maxIdle" value="${jdbc.maxIdle}" />
+		
+		<!-- 커넥션 풀에 반납할 때 최소로 유지되는 커넥션의수  -->
+		<property name="minIdle" value="${jdbc.minIdle}" />
+	</bean>
+	
+	<!-- mybatis:config(mapper 위치 지정) : SSFB(SqlSessionFactoryBean) 클래스 사용 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 위에서 지정한 dataSource 사용 -->
+		<property name="dataSource" ref="dataSource" />
+		
+		<!-- mapper의 정보를 담고 있는 config 위치를 넣어준다. -->
+		<!-- classpath:mybatis-config.xml는 src/main/resources에 생성해준다. -->
+		<!-- mapper.xml들은 src/main/resources/mappers에 모아놓는다. -->
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+	</bean>
+		
+	<!-- mybatis: SqlSessionTemplate : 실제로 실행하는 클래스(위의 정보값을 가지고 DB에 접속한다.) -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+	
+	
+	<!-- DAO는 어노테이션 처리한다.-->
+	<context:annotation-config/>
+	<context:component-scan base-package="com.ict.*" />
+</beans>
